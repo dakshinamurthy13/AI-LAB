@@ -1,93 +1,136 @@
-no_of_pred = 0
-no_of_arg = [None for i in range(10)]
+import re
+def getAttributes(expression):
+    expression = expression.split("(")[1:]
+    expression = "(".join(expression) 
+    expression = expression.split(")")[:-1]
+    expression = ")".join(expression)
+    attributes = expression.split(',')
+    return attributes
 
-predicate = [None for i in range(10)]
-argument = [[None for i in range(10)] for i in range(10)]
+def getInitialPredicate(expression):
+    return expression.split("(")[0]
 
+def isConstant(char):
+    return char.isupper() and len(char) == 1
+
+def isVariable(char):
+    return char.islower() and len(char) == 1
+
+def replaceAttributes(exp, old, new):
+    attributes = getAttributes(exp)
+    predicate = getInitialPredicate(exp)
+    for index, val in enumerate(attributes):
+        if val == old:
+            attributes[index] = new
+    return predicate + "(" + ",".join(attributes) + ")"
+
+def apply(exp, substitutions):
+    for substitution in substitutions:
+        new, old = substitution  
+        exp = replaceAttributes(exp, old, new)
+    return exp
+
+def checkOccurs(var, exp):
+    if exp.find(var) == -1:
+        return False
+    return True
+
+
+def getFirstPart(expression):
+    attributes = getAttributes(expression)
+    return attributes[0]
+
+
+def getRemainingPart(expression):
+    predicate = getInitialPredicate(expression)
+    attributes = getAttributes(expression)
+    newExpression = predicate + "(" + ",".join(attributes[1:]) + ")"
+    return newExpression
+
+def unify(exp1, exp2):
+    if exp1 == exp2:
+        return []
+
+    if isConstant(exp1) and isConstant(exp2):
+        if exp1 != exp2:
+            print(f"{exp1} and {exp2} are constants. Cannot be unified")
+            return []
+
+    if isConstant(exp1):
+        return [(exp1, exp2)]
+
+    if isConstant(exp2):
+        return [(exp2, exp1)]
+
+    if isVariable(exp1):
+        return [(exp2, exp1)] if not checkOccurs(exp1, exp2) else []
+
+    if isVariable(exp2):
+        return [(exp1, exp2)] if not checkOccurs(exp2, exp1) else []
+
+    if getInitialPredicate(exp1) != getInitialPredicate(exp2):
+        print("Cannot be unified as the predicates do not match!")
+        return []
+
+    attributeCount1 = len(getAttributes(exp1))
+    attributeCount2 = len(getAttributes(exp2))
+    if attributeCount1 != attributeCount2:
+        print(f"Length of attributes {attributeCount1} and {attributeCount2} do not match. Cannot be unified")
+        return []
+
+    head1 = getFirstPart(exp1)
+    head2 = getFirstPart(exp2)
+    initialSubstitution = unify(head1, head2)
+    if not initialSubstitution:
+        return []
+    if attributeCount1 == 1:
+        return initialSubstitution
+
+    tail1 = getRemainingPart(exp1)
+    tail2 = getRemainingPart(exp2)
+
+    if initialSubstitution != []:
+        tail1 = apply(tail1, initialSubstitution)
+        tail2 = apply(tail2, initialSubstitution)
+
+    remainingSubstitution = unify(tail1, tail2)
+    if not remainingSubstitution:
+        return []
+
+    return initialSubstitution + remainingSubstitution
 
 def main():
-    global no_of_pred
-    ch = 'y'
-    while(ch == 'y'):
-        print("=========PROGRAM FOR UNIFICATION=========")
-        no_of_pred = int(input("Enter Number of Predicates:"))
-        for i in range(no_of_pred):
-            # nouse=input() #   //to accept "enter" as a character
-            print("Enter Predicate ", (i+1), " :")
-            predicate[i] = input()
-            print("Enter No.of Arguments for Predicate ", predicate[i], " :")
-            no_of_arg[i] = int(input())
-
-            for j in range(no_of_arg[i]):
-                print("Enter argument ", j+1, " :")
-                argument[i][j] = input()
-
-        display()
-        chk_arg_pred()
-        ch = input("Do you want to continue(y/n):   ")
-
-
-def display():
-
-    print("=======PREDICATES ARE======")
-    for i in range(no_of_pred):
-        print(predicate[i], "(", end="")
-        for j in range(no_of_arg[i]):
-            print(argument[i][j], end="")
-            if(j != no_of_arg[i]-1):
-                print(",", end="")
-        print(")")
-
-
-# /*==========UNIFY FUNCTION=========*/
-
-def unify():
-    flag = 0
-    for i in range(no_of_pred-1):
-        for j in range(no_of_arg[i]):
-            if(argument[i][j] != argument[i+1][j]):
-                if(flag == 0):
-                    print("======SUBSTITUTION IS======")
-                    print(argument[i+1][j], "/", argument[i][j])
-                    flag += 1
-
-        if(flag == 0):
-            print("Arguments are Identical...")
-            print("No need of Substitution")
-
-
-def chk_arg_pred():
-    pred_flag = 0
-    arg_flag = 0
-
-   # /*======Checking Prediactes========*/
-    for i in range(no_of_pred-1):
-        if(predicate[i] != predicate[i+1]):
-            print("Predicates not same..")
-            print("Unification cannot progress!")
-            pred_flag = 1
-            break
-
-   # /*=====Chking No of Arguments====*/
-
-    if(pred_flag != 1):
-        ind = 0
-        key = no_of_arg[ind]
-        l = len(no_of_arg)
-        for i in range(0, key-1):
-            if i >= key:
-                continue
-            if ind != l-1:
-                ind += 1
-                key = no_of_arg[ind]
-            if(no_of_arg[i] != no_of_arg[i+1]):
-
-                print("Arguments Not Same..!")
-                arg_flag = 1
-                break
-
-        if(arg_flag == 0 and pred_flag != 1):
-            unify()
-
+    print("Enter the first expression")
+    e1 = input()
+    print("Enter the second expression")
+    e2 = input()
+    substitutions = unify(e1, e2)
+    print("The substitutions are:")
+    print([' / '.join(substitution) for substitution in substitutions])
 
 main()
+
+# Test 1
+# Enter the first expression
+# knows(f(x),y)
+# Enter the second expression
+# knows(J,John)
+# The substitutions are:
+# ['J / f(x)', 'John / y']
+
+# Test 2
+# Enter the first expression
+# Student(x)
+# Enter the second expression
+# Teacher(Rose)
+# Cannot be unified as the predicates do not match!
+# The substitutions are:
+# []
+
+# Test 3
+# Enter the first expression
+# knows(John,x)
+# Enter the second expression
+# knows(y,Mother(y))
+# The substitutions are:
+# ['John / y', 'Mother(y) / x']
