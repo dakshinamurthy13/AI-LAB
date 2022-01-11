@@ -95,3 +95,11 @@ if ans:
     print("Knowledge base entails query")
 else:
     print("Knowledge base does not entail query")
+    
+# Test case 1
+# Enter rule: (~qv~pvr)^(~q^p)^q
+# Enter the Query: r
+
+# Test case 2
+# Enter rule: (pvq)^(~rvp)
+# Enter the Query: p^r
