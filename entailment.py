@@ -1,5 +1,25 @@
-combination = [(True,True,True),(True,True,False),(True,False,True),(True,False,False),(False,True,True),(False,True,False),(False,False,True),(False,False,False)]
-variable = {'p':0,'q':1,'r':2}
+combination = []
+variable = {}
+
+def generateCombination(n):
+    comb=[]
+    boolComb=[]
+    booleanValue={"1":True,"0":False}
+    for i in range(pow(2,n)):
+        num=str(bin(i).replace("0b", ""))
+        while len(num) < n:
+            num = "0" + num
+        comb.append([n for n in num])
+    for c in comb:
+        boolComb.append([booleanValue[t]for t in c])
+    return boolComb
+
+def generateVariable(n):
+    v=dict()
+    values="pqrstuvw"
+    for i in range(n):
+        v[values[i]]=i
+    return v
 
 kb = ''
 q = ''
@@ -7,8 +27,14 @@ q = ''
 priority = {'~':3,'v':1,'^':2}
 
 def input_rules():
-    global kb,q
-    kb = (input("Enter rule :  "))
+    global kb,q,combination,variable
+    n=int(input("Enter number of variables : "))
+    combination=generateCombination(n)
+    variable=generateVariable(n)
+    print("Available variables")
+    print(variable)
+    print("Enter the kb according to the variables")
+    kb = (input("Enter knowledge base :  "))
     q = (input("enter query :  "))
 
 def _eval(i,val1,val2):
@@ -95,3 +121,107 @@ if ans:
     print("Knowledge base entails query")
 else:
     print("Knowledge base does not entail query")
+
+# Test case 1
+# Enter number of variables : 5
+# Available variables
+# {'p': 0, 'q': 1, 'r': 2, 's': 3, 't': 4}
+# Enter the kb according to the variables 
+# Enter knowledge base :  (~pv~qvr)^(~sv~tvq)^s^t^p
+# enter query :  r
+# **********Truth Table Reference**********
+# kb alpha
+# **********
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# False True
+# ----------
+# True True
+# ----------
+# Knowledge base entails query
+
+# Test case 2
+# Enter number of variables : 3
+# Available variables
+# {'p': 0, 'q': 1, 'r': 2}
+# Enter the kb according to the variables
+# Enter knowledge base :  (~qv~pvr)^(~q^p)^q
+# enter query :  r
+# **********Truth Table Reference**********
+# kb alpha
+# **********
+# False False
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# False False
+# ----------
+# False True
+# ----------
+# Knowledge base entails query
