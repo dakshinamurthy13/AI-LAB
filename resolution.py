@@ -80,3 +80,17 @@ def main():
     resolution(kb,query)
 
 main()
+# Enter the kb:
+# Rv~P Rv~Q ~RvP ~RvQ
+# Enter the query:
+# R
+
+# Enter the kb:
+# PvQ PvR ~PvR RvS Rv~Q ~Sv~Q
+# Enter the query:
+# R
+
+
+
+#test 2
+#(P=>Q)=>Q, (P=>P)=>R, (R=>S)=>~(S=>Q)

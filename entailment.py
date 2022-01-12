@@ -225,3 +225,4 @@ else:
 # False True
 # ----------
 # Knowledge base entails query
+
